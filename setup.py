@@ -19,11 +19,6 @@ long_description = (
     + '\n' +
     read('docs', 'CHANGES.txt')
     + '\n' +
-    'Contributors\n'
-    '************\n'
-    + '\n' +
-    read('docs', 'CONTRIBUTORS.txt')
-    + '\n' +
     'Download\n'
     '********\n')
 
