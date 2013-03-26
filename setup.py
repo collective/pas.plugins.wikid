@@ -12,7 +12,7 @@ def read(*rnames):
 version = '0.1'
 
 long_description = (
-    read('docs', 'README.txt')
+    read('README.rst')
     + '\n' +
     'Change history\n'
     '**************\n'
@@ -31,7 +31,7 @@ tests_require = ['zope.testing']
 
 setup(name='pas.plugins.wikid',
       version=version,
-      description="",
+      description="This is a WiKID Strong Authentication System Plugin for the Zope2 Pluggable Authentication Service (PAS).",
       long_description=long_description,
       # Get more strings from
       # http://pypi.python.org/pypi?:action=list_classifiers
