@@ -19,13 +19,6 @@ long_description = (
     + '\n' +
     read('docs', 'CHANGES.txt')
     + '\n' +
-    'Detailed Documentation\n'
-    '**********************\n'
-    + '\n' +
-    read('pas',
-         'plugins',
-         'wikid', 'README.txt')
-    + '\n' +
     'Contributors\n'
     '************\n'
     + '\n' +
