@@ -17,10 +17,7 @@ long_description = (
     'Change history\n'
     '**************\n'
     + '\n' +
-    read('docs', 'CHANGES.txt')
-    + '\n' +
-    'Download\n'
-    '********\n')
+    read('docs', 'CHANGES.txt'))
 
 tests_require = ['zope.testing']
 
