@@ -13,7 +13,7 @@ DEBUGGING = False
 
 
 def DEBUG(s):
-    if DEBUGGING == True:
+    if DEBUGGING:
         print s
 
 
@@ -100,7 +100,7 @@ class pywClient:
         """ Send request over the socket and return the response.
         """
 
-        if self.reconnect() != True:
+        if not self.reconnect():
             DEBUG('Unable to connect to the server. Exiting...')
             sys.exit(-1)
 
@@ -149,9 +149,9 @@ class pywClient:
         return response
 
     def reconnect(self):
-        "Reconnect to the server in case connection drops out."
+        """ Reconnect to the server in case connection drops out. """
         DEBUG(dir(self))
-        if self.gotConnection == False:
+        if not self.gotConnection:
             DEBUG("Reconnecting to host ...")
             try:
                 self.sock.connect((self.host, self.port))
