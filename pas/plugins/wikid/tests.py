@@ -20,6 +20,10 @@ class TestCase(ptc.PloneTestCase):
             zcml.load_config('configure.zcml',
                              pas.plugins.wikid)
             fiveconfigure.debug_mode = False
+            # This is only necessary for packages outside the Products.* namespace
+            # which are also declared as Zope 2 products, using
+            # <five:registerPackage /> in ZCML. See 'pas/plugins/wikid/configure.zcml'.
+            ztc.installPackage('pas.plugins.wikid')
 
         @classmethod
         def tearDown(cls):
@@ -37,4 +41,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-
