@@ -4,11 +4,7 @@ Python Client for wikid '''
 from OpenSSL import *
 from xml.dom import minidom, Node
 import sys
-import re
-import select
 import socket
-import os
-import traceback
 import time
 
 __author__ = "Manish Rai Jain <manishrjain@gmail.com>"
@@ -17,7 +13,7 @@ DEBUGGING = False
 
 
 def DEBUG(s):
-    if DEBUGGING == True:
+    if DEBUGGING:
         print s
 
 
@@ -29,22 +25,28 @@ def verify_cb(conn, cert, errnum, depth, ok):
 
 class pywClient:
 
-    def __init__(self, filename=None, host=None, port=None, pkey=None, passPhrase=None, caCert=None):
-        "This will create a SSL Connection b/w client and server"
+    def __init__(self, host=None, port=None, pkey=None, passPhrase=None, caCert=None):
+        """ This will create a SSL Connection b/w client and server.
+        :param host: IP address of WIKID server
+        :type host: string
+        :param port: TCP port number to connect to (default 8388)
+        :type port: string
+        :param pkey: A path to the PKCS12 certificate file
+        :type pkey: string
+        :param passPhrase: a passphrase to open the PKCS12 file
+        :type passPhrase: string
+        :param caCert: - a path to certificate for validating
+            the WAS server certificate.
+        :type caCert: string
+        """
 
         DEBUG("DEBUG activated")
-        self.filename = filename
         self.host = host
         self.port = port
         self.pkey = pkey
         self.passPhrase = passPhrase
         self.cacert = caCert
 
-        if filename is not None:
-            # Parse the properties file here
-            print ''
-
-        #ctx = SSL.Context(SSL.TLSv1_METHOD)
         ctx = SSL.Context(SSL.SSLv3_METHOD)
         ctx.set_verify(SSL.VERIFY_PEER, verify_cb)
         ctx.set_verify(SSL.VERIFY_NONE, verify_cb)
@@ -61,21 +63,19 @@ class pywClient:
         ctx.use_privatekey(pkeyObj)
         ctx.use_certificate(x509Obj)
 
-        #ctx.load_verify_locations(ca_cert)
-
         self.sock = SSL.Connection(
             ctx, socket.socket(socket.AF_INET, socket.SOCK_STREAM))
         self.gotConnection = False
 
     def xmlrequest(self, message=None):
-        "Send XML request over the socket and return the XML response."
+        """ Send XML request over the socket and return the XML response.
+        """
         DEBUG("XML message:")
         DEBUG(message)
         DEBUG("--------------------------------")
         message = message.replace('\n', '')
         message = message.replace('\r', '')
         message = message + "\n"
-        #message = '<?xml version="1.0" encoding="UTF-8"?>\n' + message
         response = self.request(message)
         DEBUG("XML response:")
         DEBUG("--------------------------------")
@@ -97,9 +97,10 @@ class pywClient:
         return node
 
     def request(self, message=None):
-        "Send request over the socket and return the response."
+        """ Send request over the socket and return the response.
+        """
 
-        if self.reconnect() != True:
+        if not self.reconnect():
             DEBUG('Unable to connect to the server. Exiting...')
             sys.exit(-1)
 
@@ -148,9 +149,9 @@ class pywClient:
         return response
 
     def reconnect(self):
-        "Reconnect to the server in case connection drops out."
+        """ Reconnect to the server in case connection drops out. """
         DEBUG(dir(self))
-        if self.gotConnection == False:
+        if not self.gotConnection:
             DEBUG("Reconnecting to host ...")
             try:
                 self.sock.connect((self.host, self.port))
@@ -165,7 +166,7 @@ class pywClient:
         return self.gotConnection
 
     def ping(self):
-        "Send a ping to the server, to make sure it's open"
+        """ Send a ping to the server, to make sure it's open """
         message = "<transaction> <type>1</type> <data> <value>TX</value> </data> </transaction>"
         self.xmlrequest(message)
 
@@ -178,12 +179,30 @@ class pywClient:
                 print '    ID: %s' % node.attributes.get('ID').value
 
     def checkCredentials(self, user=None, domaincode=None, passcode=None, challenge=None, response=None):
+        """ This method returns a boolean representing successful or
+            unsuccessful authentication.
+        :param user: userid to validate credentials.
+        :type user: string
+        :param domaincode: the 12-digit code that represents the server/domain
+        :type domaincode: string
+        :param passcode: time-bounded, 1 use passcode.
+            It's a code which you get when you use a token client
+            (http://wikidsystems.com/downloads/token-clients).
+        :type passcode: string
+        :example passcode: '260328'
+        :param challenge: the challenge value provided to the user
+        :type challenge: string
+        :param response: the hashed/signed response from the device
+        :type response: string
+        """
         return self.verify("base", user, domaincode, passcode, challenge, response, chap_password='', chap_challenge='', wikid_challenge=None)
 
     def verify(
         self, format, user=None, domaincode=None, passcode=None, challenge=None, response=None,
             chap_password=None, chap_challenge=None, wikid_challenge=None):
-        "This helper method verifies credentials using the specified mechanism"
+        """ This helper method verifies credentials using
+           the specified mechanism
+        """
 
         xml = """<transaction>
         <type format="%s">2</type>
@@ -223,7 +242,23 @@ class pywClient:
         return self.verify(user, format, domaincode, passcode, '', '', chap_password, chap_challenge, wikid_challenge)
 
     def registerUsername(self, uname=None, regcode=None, domaincode=None, passcode=None):
-        "This method creates an association between the userid and the device registered by the user."
+        """ This method creates an association between the userid and
+            the device registered by the user.
+        :param uname: userid with which to associate device
+        :type uname: string
+        :param regcode: the registration code which you get from
+            a token client (http://wikidsystems.com/downloads/token-clients).
+        :type regcode: string
+        :example regcode: '5Q4zvqIh'
+        :param domaincode: the 12-digit code that represents the server/domain
+        :type domaincode: string
+        :param passcode: time-bounded, 1 use passcode.
+            It's a code which you get when you use a token client
+            (http://wikidsystems.com/downloads/token-clients).
+        :type passcode: string
+        :example passcode: '260328'
+        """
+
 
         if passcode is not None and len(passcode) > 0:
             DEBUG("Adding new device ...")
@@ -269,7 +304,9 @@ class pywClient:
         return 2
 
     def startConnection(self):
-        "Authentication procedure completed. Start off connection with the server now."
+        """ Authentication procedure completed.
+           Start off connection with the server now.
+        """
         DEBUG("startConnection() ...")
         mesg = "WiKID Python Client v3.0"
         message = """<transaction> <type>1</type> <data> <client-string>%s</client-string> <server-string>null</server-string> <result>null</result> </data> </transaction>
@@ -286,7 +323,7 @@ class pywClient:
         return self.connected
 
     def getDomains(self):
-        "To be implemented. Has to be tested"
+        """ To be implemented. Has to be tested """
         DEBUG('getDomains: Still to be implemented')
 
         message = """<transaction> <type>3</type> <data> <domain-list>null</domain-list> </data> </transaction>"""
@@ -294,17 +331,3 @@ class pywClient:
         response = self.xmlrequest(message)
         result = response.getElementsByTagName("domain-list")[0]
         print result
-
-
-if __name__ == "__main__":
-    "Testing purposes"
-
-    w = pywClient(host='127.0.0.1', port=8388, pkey='localhost.p12',
-                  passPhrase='secret', caCert='WiKID-ca.pem')
-    w.startConnection()
-    if w.checkCredentials(user='username', domaincode='127000000001', passcode='passhphrase'):
-        print 'Cool Valid user'
-    else:
-        print 'No lah! No Entry!'
-    print w.registerUsername(
-        uname='uname', regcode='register', domaincode='haha')
