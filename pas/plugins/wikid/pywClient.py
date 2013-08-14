@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 def verify_cb(conn, cert, errnum, depth, ok):
-    # Modify here
-    # print 'Got certificate: %s' % cert.get_subject()
+    """ It should return true if verification passes and false otherwise.
+    """
     return ok
 
 
@@ -154,14 +154,6 @@ class pywClient:
     def ping(self):
         """ Send a ping to the server, to make sure it's open """
         self.xmlrequest(PING)
-
-    def showNode(node):
-        if node.nodeType == Node.ELEMENT_NODE:
-            print 'Element name: %s' % node.nodeName
-            for (name, value) in node.attributes.items():
-                print '    Attr -- Name: %s  Value: %s' % (name, value)
-            if node.attributes.get('ID') is not None:
-                print '    ID: %s' % node.attributes.get('ID').value
 
     def checkCredentials(self, user='null', domaincode='null',
                          passcode='null', challenge='null', response='null'):
