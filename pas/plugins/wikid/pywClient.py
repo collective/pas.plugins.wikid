@@ -6,18 +6,15 @@ from xml.dom import minidom, Node
 import sys
 import socket
 import time
+import logging
 
 from wauth import PING, CONNECT, LOGIN, REGISTRATION
 
 __author__ = "Manish Rai Jain <manishrjain@gmail.com>"
 
 CLIENT_ID = "WiKID Python Client v4.0"
-DEBUGGING = False
 
-
-def DEBUG(s):
-    if DEBUGGING:
-        print s
+logger = logging.getLogger(__name__)
 
 
 def verify_cb(conn, cert, errnum, depth, ok):
@@ -81,7 +78,7 @@ class pywClient:
             doc = minidom.parseString(response)
             node = doc.documentElement
         except Exception, error:
-            DEBUG("Error: %s" % error)
+            logger.error("Error: %s" % error)
             sys.exit(1)
 
         return node
@@ -91,22 +88,22 @@ class pywClient:
         """
 
         if not self.reconnect():
-            DEBUG('Unable to connect to the server. Exiting...')
+            logger.info('Unable to connect to the server. Exiting...')
             sys.exit(-1)
 
         response = ''
         try:
-            DEBUG('Sending request: ' + message)
+            logger.debug('Sending request: ' + message)
             totalsent = 0
             sent = self.sock.send(message)
             if sent == 0:
                 raise RuntimeError("socket connection broken")
                 totalsent = totalsent + sent
 # not quite working:
-#                       DEBUG('Bytes sent: %s ' % totalsent)
+#                       logger.debug('Bytes sent: %s ' % totalsent)
 #                       while True:
 #                               data = self.sock.recv(100)
-#                               DEBUG('data chunk: %s ' % data)
+#                               logger.debug('data chunk: %s ' % data)
 #                               if not data: break
 
 # SOURCE: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/408859
@@ -130,9 +127,9 @@ class pywClient:
                         time.sleep(0.1)
                 except:
                     pass
-            DEBUG('Response received: ' + response)
+            logger.debug('Response received: ' + response)
         except Exception, err:
-            DEBUG("Error connecting: %s" % (err))
+            logger.error("Error connecting: %s" % (err))
             print sys.exc_info()
             self.gotConnection = False
 
@@ -141,15 +138,15 @@ class pywClient:
     def reconnect(self):
         """ Reconnect to the server in case connection drops out. """
         if not self.gotConnection:
-            DEBUG("Reconnecting to host ...")
+            logger.debug("Reconnecting to host ...")
             try:
                 self.sock.connect((self.host, self.port))
-                DEBUG("Reconnected to host. Trying Handshake...")
+                logger.debug("Reconnected to host. Trying Handshake...")
                 self.sock.do_handshake()
-                DEBUG("Handshaking done")
+                logger.debug("Handshaking done")
                 self.gotConnection = True  # self.startConnection()
             except SSL.Error:
-                DEBUG('Oops! Reconnection also failed')
+                logger.error('Oops! Reconnection also failed')
                 self.gotConnection = False
 
         return self.gotConnection
@@ -239,7 +236,7 @@ class pywClient:
         """
 
         # TODO Add new device.
-        DEBUG("Registering user ...")
+        logger.info("Registering user ...")
         format = "new"
 
         message = REGISTRATION % locals()
@@ -247,7 +244,7 @@ class pywClient:
         try:
             response = self.xmlrequest(message)
             result = response.getElementsByTagName("result")[0].firstChild.data
-            DEBUG("result = %s" % result)
+            logger.debug("result = %s" % result)
             if result == 'SUCCESS' or result == "SUCESS":
                 self.connected = True
             else:
@@ -255,16 +252,16 @@ class pywClient:
         except SSL.Error:
             self.gotConnection = False
         except:
-            DEBUG('Problem in parsing the reply')
+            logger.error('Problem in parsing the reply')
             return 2
-        DEBUG('Error reading from server')
+        logger.error('Error reading from server')
         return 2
 
     def startConnection(self):
         """ Authentication procedure completed.
            Start off connection with the server now.
         """
-        DEBUG("Start Connection...")
+        logger.info("Start Connection...")
         message = CONNECT % {'client': CLIENT_ID}
         self.connected = False
         try:
@@ -278,11 +275,10 @@ class pywClient:
         return self.connected
 
     def getDomains(self):
-        """ To be implemented. Has to be tested """
-        DEBUG('getDomains: Still to be implemented')
-
+        """ To be implemented. Has to be tested.
+           'getDomains: Still to be implemented'
+        """
         message = """<transaction> <type>3</type> <data> <domain-list>null</domain-list> </data> </transaction>"""
-
         response = self.xmlrequest(message)
         result = response.getElementsByTagName("domain-list")[0]
         print result
