@@ -1,6 +1,7 @@
 """ It tests the python wikid client. """
 
 import unittest
+import logging
 from pas.plugins.wikid.pywClient import pywClient
 
 
@@ -51,4 +52,10 @@ class TestWikidClient(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    # Set up the logging level for testing.
+    logger = logging.getLogger('pywClient')
+    logger.addHandler(logging.StreamHandler())
+    # 'logging.DEBUG' to get more details
+    logger.setLevel(logging.INFO)
+    # Run tests
     unittest.main()
