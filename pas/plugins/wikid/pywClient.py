@@ -185,6 +185,9 @@ class pywClient:
                            response, chap_password='null',
                            chap_challenge='null', wikid_challenge=None)
 
+    def getResponseState(self, response):
+        return response.getElementsByTagName("result")[0].firstChild.data
+
     def verify(self, format, user='null', domaincode='null', passcode='null',
                challenge='null', response='null', chap_password='null',
                chap_challenge='null', wikid_challenge='null'):
@@ -193,17 +196,8 @@ class pywClient:
         """
 
         message = LOGIN % locals()
-        self.validCredentials = False
-
-        try:
-            response = self.xmlrequest(message)
-            result = response.getElementsByTagName("result")[0].firstChild.data
-            if result == 'VALID':
-                self.validCredentials = True
-        except SSL.Error:
-            self.gotConnection = False
-
-        return self.validCredentials
+        result = self.getResponseState(self.xmlrequest(message))
+        return result == 'VALID'
 
     def chapVerify(self, user=None, domaincode=None, chap_password=None,
                    chap_challenge=None, wikid_challenge=None):
@@ -238,24 +232,12 @@ class pywClient:
         # TODO Add new device.
         logger.info("Registering user ...")
         format = "new"
-
         message = REGISTRATION % locals()
 
-        try:
-            response = self.xmlrequest(message)
-            result = response.getElementsByTagName("result")[0].firstChild.data
-            logger.debug("result = %s" % result)
-            if result == 'SUCCESS' or result == "SUCESS":
-                self.connected = True
-            else:
-                return result
-        except SSL.Error:
-            self.gotConnection = False
-        except:
-            logger.error('Problem in parsing the reply')
-            return 2
-        logger.error('Error reading from server')
-        return 2
+        result = self.getResponseState(self.xmlrequest(message))
+        if result in ('SUCCESS', 'SUCESS'):
+            self.connected = True
+        return result
 
     def startConnection(self):
         """ Authentication procedure completed.
@@ -264,14 +246,10 @@ class pywClient:
         logger.info("Start Connection...")
         message = CONNECT % {'client': CLIENT_ID}
         self.connected = False
-        try:
-            response = self.xmlrequest(message)
-            result = response.getElementsByTagName("result")[0].firstChild.data
-            if result == 'ACCEPT':
-                self.connected = True
-        except SSL.Error:
-            self.gotConnection = False
 
+        result = self.getResponseState(self.xmlrequest(message))
+        if result == 'ACCEPT':
+            self.connected = True
         return self.connected
 
     def getDomains(self):
