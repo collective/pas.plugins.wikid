@@ -37,7 +37,7 @@ class TestWikidClient(unittest.TestCase):
         self.assertEqual(
             2,    #TODO: rewrite 'registerUsername'
             self.client.registerUsername(
-                uname=USER, regcode=REGCODE, domaincode=DOMAINCODE
+                user=USER, regcode=REGCODE, domaincode=DOMAINCODE
             )
         )
         # Check user's credentials
