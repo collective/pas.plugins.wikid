@@ -7,8 +7,11 @@ import sys
 import socket
 import time
 
+from wauth import PING, CONNECT, LOGIN, REGISTRATION
+
 __author__ = "Manish Rai Jain <manishrjain@gmail.com>"
 
+CLIENT_ID = "WiKID Python Client v4.0"
 DEBUGGING = False
 
 
@@ -167,8 +170,7 @@ class pywClient:
 
     def ping(self):
         """ Send a ping to the server, to make sure it's open """
-        message = "<transaction> <type>1</type> <data> <value>TX</value> </data> </transaction>"
-        self.xmlrequest(message)
+        self.xmlrequest(PING)
 
     def showNode(node):
         if node.nodeType == Node.ELEMENT_NODE:
@@ -178,7 +180,7 @@ class pywClient:
             if node.attributes.get('ID') is not None:
                 print '    ID: %s' % node.attributes.get('ID').value
 
-    def checkCredentials(self, user=None, domaincode=None, passcode=None, challenge=None, response=None):
+    def checkCredentials(self, user='null', domaincode='null', passcode='null', challenge='null', response='null'):
         """ This method returns a boolean representing successful or
             unsuccessful authentication.
         :param user: userid to validate credentials.
@@ -195,35 +197,22 @@ class pywClient:
         :param response: the hashed/signed response from the device
         :type response: string
         """
-        return self.verify("base", user, domaincode, passcode, challenge, response, chap_password='', chap_challenge='', wikid_challenge=None)
+        return self.verify("base", user, domaincode, passcode, challenge, response, chap_password='null',
+                           chap_challenge='null', wikid_challenge=None)
 
-    def verify(
-        self, format, user=None, domaincode=None, passcode=None, challenge=None, response=None,
-            chap_password=None, chap_challenge=None, wikid_challenge=None):
+    def verify(self, format, user='null', domaincode='null', passcode='null',
+               challenge='null', response='null', chap_password='null',
+               chap_challenge='null', wikid_challenge='null'):
         """ This helper method verifies credentials using
            the specified mechanism
         """
 
-        xml = """<transaction>
-        <type format="%s">2</type>
-    <data>
-        <user-id>%s</user-id>
-        <passcode>%s</passcode>
-        <domaincode>%s</domaincode>
-        <offline-challenge encoding="none">%s</offline-challenge>
-        <offline-response encoding="none">%s</offline-response>
-        <chap-password encoding="none">%s</chap-password>
-        <chap-challenge encoding="none">%s</chap-challenge>
-        <result>null</result>
-    </data>
-</transaction>
 
-""" % (format, user, passcode, domaincode, challenge, response, chap_password, chap_challenge)
-
+        message = LOGIN % locals()
         self.validCredentials = False
 
         try:
-            response = self.xmlrequest(xml)
+            response = self.xmlrequest(message)
             result = response.getElementsByTagName("result")[0].firstChild.data
             if result == 'VALID':
                 self.validCredentials = True
@@ -241,11 +230,11 @@ class pywClient:
 
         return self.verify(user, format, domaincode, passcode, '', '', chap_password, chap_challenge, wikid_challenge)
 
-    def registerUsername(self, uname=None, regcode=None, domaincode=None, passcode=None):
+    def registerUsername(self, user=None, regcode=None, domaincode=None, passcode=None, group='null'):
         """ This method creates an association between the userid and
             the device registered by the user.
-        :param uname: userid with which to associate device
-        :type uname: string
+        :param user: userid with which to associate device
+        :type user: string
         :param regcode: the registration code which you get from
             a token client (http://wikidsystems.com/downloads/token-clients).
         :type regcode: string
@@ -259,33 +248,11 @@ class pywClient:
         :example passcode: '260328'
         """
 
+        # TODO Add new device.
+        DEBUG("Registering user ...")
+        format = "new"
 
-        if passcode is not None and len(passcode) > 0:
-            DEBUG("Adding new device ...")
-            command = "ADDREGUSER"
-            type = 4
-            passcodeline = "<passcode>%s</passcode>" % passcode
-            format = "add"
-        else:
-            DEBUG("Registering user ...")
-            command = "REGUSER"
-            type = 4
-            passcodeline = ""
-            format = "new"
-
-        message = """<transaction>
-    <type format="%s">%s</type>
-    <data>
-    <user-id>%s</user-id>
-    <registration-code>%s</registration-code>
-    <domaincode>%s</domaincode>
-    %s
-    <error-code>null</error-code>
-    <groupName>null</groupName>
-    <result>null</result>
-    </data>
-</transaction>
-""" % (format, type, uname, regcode, domaincode, passcodeline)
+        message = REGISTRATION % locals()
 
         try:
             response = self.xmlrequest(message)
@@ -308,9 +275,7 @@ class pywClient:
            Start off connection with the server now.
         """
         DEBUG("startConnection() ...")
-        mesg = "WiKID Python Client v3.0"
-        message = """<transaction> <type>1</type> <data> <client-string>%s</client-string> <server-string>null</server-string> <result>null</result> </data> </transaction>
-""" % (mesg)
+        message = CONNECT % {'client': CLIENT_ID}
         self.connected = False
         try:
             response = self.xmlrequest(message)
