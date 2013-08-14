@@ -22,13 +22,14 @@ def DEBUG(s):
 
 def verify_cb(conn, cert, errnum, depth, ok):
     # Modify here
-    #print 'Got certificate: %s' % cert.get_subject()
+    # print 'Got certificate: %s' % cert.get_subject()
     return ok
 
 
 class pywClient:
 
-    def __init__(self, host=None, port=None, pkey=None, passPhrase=None, caCert=None):
+    def __init__(self, host=None, port=None, pkey=None, passPhrase=None,
+                 caCert=None):
         """ This will create a SSL Connection b/w client and server.
         :param host: IP address of WIKID server
         :type host: string
@@ -55,8 +56,8 @@ class pywClient:
         ctx.set_verify(SSL.VERIFY_NONE, verify_cb)
         ctx.load_verify_locations(None, self.cacert)
 
-        #Get X509 certificate and the private key from the
-        #initial .p12 file provided to network client
+        # Get X509 certificate and the private key from the
+        # initial .p12 file provided to network client
         f = open(pkey)
 
         pkcs12Obj = crypto.load_pkcs12(f.read(), passPhrase)
@@ -128,10 +129,10 @@ class pywClient:
             data = ''
             begin = time.time()
             while 1:
-                #if you got some data, then break after wait sec
+                # if you got some data, then break after wait sec
                 if response and time.time() - begin > timeout:
                     break
-                #if you got no data at all, wait a little longer
+                # if you got no data at all, wait a little longer
                 elif time.time() - begin > timeout * 2:
                     break
                 try:
@@ -180,7 +181,8 @@ class pywClient:
             if node.attributes.get('ID') is not None:
                 print '    ID: %s' % node.attributes.get('ID').value
 
-    def checkCredentials(self, user='null', domaincode='null', passcode='null', challenge='null', response='null'):
+    def checkCredentials(self, user='null', domaincode='null',
+                         passcode='null', challenge='null', response='null'):
         """ This method returns a boolean representing successful or
             unsuccessful authentication.
         :param user: userid to validate credentials.
@@ -197,7 +199,8 @@ class pywClient:
         :param response: the hashed/signed response from the device
         :type response: string
         """
-        return self.verify("base", user, domaincode, passcode, challenge, response, chap_password='null',
+        return self.verify("base", user, domaincode, passcode, challenge,
+                           response, chap_password='null',
                            chap_challenge='null', wikid_challenge=None)
 
     def verify(self, format, user='null', domaincode='null', passcode='null',
@@ -206,7 +209,6 @@ class pywClient:
         """ This helper method verifies credentials using
            the specified mechanism
         """
-
 
         message = LOGIN % locals()
         self.validCredentials = False
@@ -221,16 +223,19 @@ class pywClient:
 
         return self.validCredentials
 
-    def chapVerify(self, user=None, domaincode=None, chap_password=None, chap_challenge=None, wikid_challenge=None):
+    def chapVerify(self, user=None, domaincode=None, chap_password=None,
+                   chap_challenge=None, wikid_challenge=None):
 
         if wikidChallenge is None:
             format = "chapOff"
         else:
             format = "chap"
 
-        return self.verify(user, format, domaincode, passcode, '', '', chap_password, chap_challenge, wikid_challenge)
+        return self.verify(user, format, domaincode, passcode, '', '',
+                           chap_password, chap_challenge, wikid_challenge)
 
-    def registerUsername(self, user=None, regcode=None, domaincode=None, passcode=None, group='null'):
+    def registerUsername(self, user=None, regcode=None, domaincode=None,
+                         passcode=None, group='null'):
         """ This method creates an association between the userid and
             the device registered by the user.
         :param user: userid with which to associate device
