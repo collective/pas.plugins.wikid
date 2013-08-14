@@ -44,7 +44,6 @@ class pywClient:
         :type caCert: string
         """
 
-        DEBUG("DEBUG activated")
         self.host = host
         self.port = port
         self.pkey = pkey
@@ -74,26 +73,13 @@ class pywClient:
     def xmlrequest(self, message=None):
         """ Send XML request over the socket and return the XML response.
         """
-        DEBUG("XML message:")
-        DEBUG(message)
-        DEBUG("--------------------------------")
         message = message.replace('\n', '')
         message = message.replace('\r', '')
         message = message + "\n"
         response = self.request(message)
-        DEBUG("XML response:")
-        DEBUG("--------------------------------")
-        DEBUG(response)
-        DEBUG("--------------------------------")
         try:
             doc = minidom.parseString(response)
-            DEBUG("XML doc:")
-            DEBUG(doc)
-            DEBUG("--------------------------------")
             node = doc.documentElement
-            DEBUG("XML node:")
-            DEBUG(node)
-            DEBUG("--------------------------------")
         except Exception, error:
             DEBUG("Error: %s" % error)
             sys.exit(1)
@@ -154,7 +140,6 @@ class pywClient:
 
     def reconnect(self):
         """ Reconnect to the server in case connection drops out. """
-        DEBUG(dir(self))
         if not self.gotConnection:
             DEBUG("Reconnecting to host ...")
             try:
@@ -279,7 +264,7 @@ class pywClient:
         """ Authentication procedure completed.
            Start off connection with the server now.
         """
-        DEBUG("startConnection() ...")
+        DEBUG("Start Connection...")
         message = CONNECT % {'client': CLIENT_ID}
         self.connected = False
         try:
