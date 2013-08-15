@@ -33,7 +33,7 @@ class TestWikidClient(unittest.TestCase):
 
     def test_registration(self):
         # Set up the connection
-        self.assertTrue(self.client.startConnection())
+        self.assertTrue(self.client.connect())
         # Validate the user
         self.assertEqual(
             2,    #TODO: rewrite 'registerUsername'

@@ -1,12 +1,13 @@
 ''' wClient.py
 Python Client for wikid '''
 
+import re
+import socket
+import logging
+from select import select
+from functools import wraps
 from OpenSSL import *
 from xml.dom import minidom, Node
-import sys
-import socket
-import time
-import logging
 
 from wauth import PING, CONNECT, LOGIN, REGISTRATION
 
@@ -21,6 +22,10 @@ def verify_cb(conn, cert, errnum, depth, ok):
     # Modify here
     # print 'Got certificate: %s' % cert.get_subject()
     return ok
+
+
+def prepare_xml_srting(s):
+    return re.sub(r'\s+', ' ', s) + '\n'
 
 
 class pywClient:
@@ -65,95 +70,60 @@ class pywClient:
 
         self.sock = SSL.Connection(
             ctx, socket.socket(socket.AF_INET, socket.SOCK_STREAM))
-        self.gotConnection = False
 
-    def xmlrequest(self, message=None):
+    def assure_connection(f):
+        @wraps(f)
+        def ensure_connection(self, *args, **kw):
+            try:
+                self.request(prepare_xml_srting(PING))
+            except SSL.Error:
+                self.establishSSLConnection()
+            return f(self, *args, **kw)
+        return ensure_connection
+
+    def establishSSLConnection(self):
+        logger.debug("Connecting...")
+        self.sock.connect((self.host, self.port))
+        logger.debug("Connected. Trying Handshake...")
+        self.sock.do_handshake()
+        logger.debug("Handshaking done.")
+
+    def xmlrequest(self, message):
         """ Send XML request over the socket and return the XML response.
         """
-        message = message.replace('\n', '')
-        message = message.replace('\r', '')
-        message = message + "\n"
-        response = self.request(message)
-        try:
+        message = prepare_xml_srting(message)
+        response = self.request(message + "\n")
+        if response:
             doc = minidom.parseString(response)
-            node = doc.documentElement
-        except Exception, error:
-            logger.error("Error: %s" % error)
-            sys.exit(1)
-
-        return node
+            return doc.documentElement
 
     def request(self, message=None):
         """ Send request over the socket and return the response.
         """
-
-        if not self.reconnect():
-            logger.info('Unable to connect to the server. Exiting...')
-            sys.exit(-1)
-
+        timeout = 2
         response = ''
-        try:
-            logger.debug('Sending request: ' + message)
-            totalsent = 0
-            sent = self.sock.send(message)
-            if sent == 0:
-                raise RuntimeError("socket connection broken")
-                totalsent = totalsent + sent
-# not quite working:
-#                       logger.debug('Bytes sent: %s ' % totalsent)
-#                       while True:
-#                               data = self.sock.recv(100)
-#                               logger.debug('data chunk: %s ' % data)
-#                               if not data: break
 
-# SOURCE: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/408859
-            self.sock.setblocking(0)
-            timeout = 2
-            data = ''
-            begin = time.time()
-            while 1:
-                # if you got some data, then break after wait sec
-                if response and time.time() - begin > timeout:
-                    break
-                # if you got no data at all, wait a little longer
-                elif time.time() - begin > timeout * 2:
-                    break
-                try:
-                    data = self.sock.recv(8192)
-                    if data:
-                        response = response + data
-                        begin = time.time()
-                    else:
-                        time.sleep(0.1)
-                except:
-                    pass
-            logger.debug('Response received: ' + response)
-        except Exception, err:
-            logger.error("Error connecting: %s" % (err))
-            print sys.exc_info()
-            self.gotConnection = False
+        logger.debug('Sending request: ' + message)
+        sent = self.sock.send(message)
+        if sent == 0:
+            raise RuntimeError("socket connection broken")
 
+        self.sock.setblocking(0)
+        ready = select([self.sock], [], [], timeout)
+        if ready[0]:
+            while not response.endswith("\n"):
+                chunk = self.sock.recv(8192)
+                if chunk:
+                    response = response + chunk
+                else:
+                    break
+        logger.debug('Response received: ' + response)
         return response
 
-    def reconnect(self):
-        """ Reconnect to the server in case connection drops out. """
-        if not self.gotConnection:
-            logger.debug("Reconnecting to host ...")
-            try:
-                self.sock.connect((self.host, self.port))
-                logger.debug("Reconnected to host. Trying Handshake...")
-                self.sock.do_handshake()
-                logger.debug("Handshaking done")
-                self.gotConnection = True  # self.startConnection()
-            except SSL.Error:
-                logger.error('Oops! Reconnection also failed')
-                self.gotConnection = False
-
-        return self.gotConnection
-
+    @assure_connection
     def ping(self):
         """ Send a ping to the server, to make sure it's open """
-        self.xmlrequest(PING)
+        return self.xmlrequest(PING)
 
     def showNode(node):
         if node.nodeType == Node.ELEMENT_NODE:
@@ -163,6 +133,7 @@ class pywClient:
             if node.attributes.get('ID') is not None:
                 print '    ID: %s' % node.attributes.get('ID').value
 
+    @assure_connection
     def checkCredentials(self, user='null', domaincode='null',
                          passcode='null', challenge='null', response='null'):
         """ This method returns a boolean representing successful or
@@ -210,6 +181,7 @@ class pywClient:
         return self.verify(user, format, domaincode, passcode, '', '',
                            chap_password, chap_challenge, wikid_challenge)
 
+    @assure_connection
     def registerUsername(self, user=None, regcode=None, domaincode=None,
                          passcode=None, group='null'):
         """ This method creates an association between the userid and
@@ -233,24 +205,17 @@ class pywClient:
         logger.info("Registering user ...")
         format = "new"
         message = REGISTRATION % locals()
-
         result = self.getResponseState(self.xmlrequest(message))
-        if result in ('SUCCESS', 'SUCESS'):
-            self.connected = True
-        return result
+        return result in ('SUCCESS', 'SUCESS')
 
-    def startConnection(self):
+    @assure_connection
+    def connect(self):
         """ Authentication procedure completed.
            Start off connection with the server now.
         """
         logger.info("Start Connection...")
         message = CONNECT % {'client': CLIENT_ID}
-        self.connected = False
-
-        result = self.getResponseState(self.xmlrequest(message))
-        if result == 'ACCEPT':
-            self.connected = True
-        return self.connected
+        return self.getResponseState(self.xmlrequest(message)) == 'ACCEPT'
 
     def getDomains(self):
         """ To be implemented. Has to be tested.
