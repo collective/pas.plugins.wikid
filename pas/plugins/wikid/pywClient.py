@@ -119,7 +119,10 @@ class pywClient:
         ready = select([self.sock], [], [], timeout)
         if ready[0]:
             while not response.endswith("\n"):
-                chunk = self.sock.recv(8192)
+                try:
+                    chunk = self.sock.recv(8192)
+                except SSL.WantReadError:
+                    continue
                 if chunk:
                     response = response + chunk
                 else:
