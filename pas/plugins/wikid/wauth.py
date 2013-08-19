@@ -146,19 +146,19 @@ ADD_PRE_REGISTRATION_CODE = """<transaction>
                                   </data>
                                 </transaction>"""
 
-# Generate a User report
-USER_REPORT = """<transaction>
-                   <type>12</type>
-                   <data dataType="USER" separator=",">
-                   <options>
-                     <includeDisabledUsers>true</includeDisabledUsers>
-                     <includeTokenData>true</includeTokenData>
-                     <groupUserData>false</groupUserData>
-                     <includeDisabledDevices>false</includeDisabledDevices>
-                     <includeUnregistered>false</includeUnregistered>
-                   </options>
-                   </data>
-                 </transaction>"""
+# Generate a User/Device report
+REPORT = """<transaction>
+              <type>12</type>
+              <data dataType="%(data_type)s" separator="%(separator)s">
+              <options>
+                <includeDisabledUsers>%(include_disable_users)s</includeDisabledUsers>
+                <includeTokenData>%(include_token_data)s</includeTokenData>
+                <groupUserData>%(group_user_data)s</groupUserData>
+                <includeDisabledDevices>%(include_disable_devices)s</includeDisabledDevices>
+                <includeUnregistered>%(include_unregistered)s</includeUnregistered>
+              </options>
+              </data>
+            </transaction>"""
 
 # List users in a domain
 LIST_USERS = """<transaction>
@@ -178,5 +178,4 @@ LIST_REGCODES = """<transaction>
                    </transaction>"""
 
 # TODO:
-    # Generate a Device/Token report
     # Delete by Device/Token

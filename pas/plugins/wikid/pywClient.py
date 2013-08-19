@@ -11,7 +11,7 @@ from xml.dom import minidom, Node
 
 from wauth import\
     (PING, CONNECT, REGISTRATION, LIST_USERS, ADD_PRE_REGISTRATION_CODE,
-     LOGIN, FIND_USER, DELETE, LIST_DOMAINS, PRE_REGISTRATION)
+     LOGIN, FIND_USER, DELETE, LIST_DOMAINS, PRE_REGISTRATION, REPORT)
 
 __author__ = "Manish Rai Jain <manishrjain@gmail.com>"
 
@@ -257,3 +257,18 @@ class pywClient:
         message = PRE_REGISTRATION % locals()
         response = self.xmlrequest(message)
         return get_tag_data(response, 'result') in ('SUCCESS', 'SUCESS')
+
+    def getReport(
+            self,
+            data_type='USER',   # Another option: 'DEVICE'
+            separator=',',
+            include_disable_users='false',
+            include_token_data='false',
+            group_user_data='false',
+            include_disable_devices='false',
+            include_unregistered='false',
+    ):
+        """ Get information according to the data_type """
+        message = REPORT % locals()
+        response = self.xmlrequest(message)
+        return get_tag_data(response, 'reportData')
