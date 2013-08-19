@@ -123,12 +123,28 @@ PRE_REGISTRATION = """<transaction>
                         <type>10</type>
                         <data>
                           <token-registration-code>%(regtoken)s</token-registration-code>
-                          <pre-registration-code>%(pre_registration_code)s</pre-registration-code>
+                          <pre-registration-code>%(prereg_code)s</pre-registration-code>
                           <domaincode>%(domaincode)s</domaincode>
                           <error-code>null</error-code>
                           <result>null</result>
                         </data>
                       </transaction> """
+
+# Before you will use PRE_REGISTRATION you have to set up preregistration-code.
+ADD_PRE_REGISTRATION_CODE = """<transaction>
+                                  <type>11</type>
+                                  <data>
+                                  <add-preregistration-set  override="%(override)s">
+                                  <add-preregistration>
+                                  <user-id>%(user)s</user-id>
+                                  <preregistration-code>%(prereg_code)s</preregistration-code>
+                                  <domaincode>%(domaincode)s</domaincode>
+                                  <result>false</result>
+                                  <result-message>null</result-message>
+                                  </add-preregistration>
+                                  </add-preregistration-set>
+                                  </data>
+                                </transaction>"""
 
 # Generate a User report
 USER_REPORT = """<transaction>
@@ -162,6 +178,5 @@ LIST_REGCODES = """<transaction>
                    </transaction>"""
 
 # TODO:
-    # Add pre-registration
     # Generate a Device/Token report
     # Delete by Device/Token

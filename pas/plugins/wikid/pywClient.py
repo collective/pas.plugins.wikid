@@ -10,8 +10,8 @@ from OpenSSL import *
 from xml.dom import minidom, Node
 
 from wauth import\
-    (PING, CONNECT, REGISTRATION, LIST_USERS,
-     LOGIN, FIND_USER, DELETE, LIST_DOMAINS)
+    (PING, CONNECT, REGISTRATION, LIST_USERS, ADD_PRE_REGISTRATION_CODE,
+     LOGIN, FIND_USER, DELETE, LIST_DOMAINS, PRE_REGISTRATION)
 
 __author__ = "Manish Rai Jain <manishrjain@gmail.com>"
 
@@ -244,3 +244,16 @@ class pywClient:
         message = DELETE % locals()
         result = get_tag_data(self.xmlrequest(message), 'result')
         return result in ('SUCCESS', 'SUCESS')
+
+    def addPreRegistrationCode(self, user, prereg_code, domaincode, override='false'):
+        """ Add a pre-registration code for the future registration. """
+        message = ADD_PRE_REGISTRATION_CODE % locals()
+        response = self.xmlrequest(message)
+        logger.info(get_tag_data(response, 'result-message'))
+        return get_tag_data(response, 'result') == 'true'
+
+    def preRegisterUser(self, regtoken, prereg_code, domaincode):
+        """ Register a user using a pre-registration code """
+        message = PRE_REGISTRATION % locals()
+        response = self.xmlrequest(message)
+        return get_tag_data(response, 'result') in ('SUCCESS', 'SUCESS')
