@@ -35,6 +35,13 @@ LOGIN = """ <transaction>
               </data>
             </transaction>"""
 
+# List domains
+LIST_DOMAINS = """<transaction>
+                    <type>3</type>
+                    <data>
+                        <domain-list>null</domain-list>
+                    </data>
+                  </transaction>"""
 
 # registration in group: groupName - name
 # registration outside group: groupName - null
@@ -44,7 +51,7 @@ REGISTRATION = """<transaction>
                       <user-id>%(user)s</user-id>
                       <registration-code>%(regcode)s</registration-code>
                       <domaincode>%(domaincode)s</domaincode>
-                      <passcode>null</passcode>
+                      <passcode>%(passcode)s</passcode>
                       <error-code>null</error-code>
                       <groupName>%(group)s</groupName>
                       <result>null</result>
@@ -93,35 +100,23 @@ UPDATE = """<transaction>
             </transaction>"""
 
 # Delete user
+# The user tag (user_tag) has to be filled in by findUser()
 DELETE = """<transaction>
               <type>7</type>
               <data>
-                <user>
-                    <user-id>api</user-id>
-                    <id_usermap>4</id_usermap>
-                    <bad-passcode-attempts>0</bad-passcode-attempts>
-                    <creation format="ms">1299214800000</creation>
-                    <domaincode>%(domaincode)s</domaincode>
-                    <status>1</status>
-                    <token-list>
-                       <token>
-                       <device-id>%(device_id)s</device-id>
-                       <domain-id>%(domain_id)s</domain-id>
-                       <offline-public-key encoding="base64">%(offline_pub_key)s</offline-public-key>
-                       <status>1</status>
-                       <bad-pin-attempts>0</bad-pin-attempts>
-                       <offline-authentication-count>0</offline-authentication-count>
-                       <creation format="ms">1299214800000</creation>
-                       <changed>false</changed>
-                       <forDeletion>false</forDeletion>
-                       <id_devicemap>6</id_devicemap>
-                       </token>
-                    </token-list>
-                </user>
+                %(user_tag)s
                 <result>null</result>
                 <return-code>%(returncode)s</return-code>
               </data>
             </transaction>"""
+
+# It's dedicated to testing
+INVALID_TRANSACTION = """<transaction>
+                            <type>9</type>
+                            <data>
+                               <value>INVALID</value>
+                            </data>
+                         </transaction>"""
 
 # Pre-Registration
 PRE_REGISTRATION = """<transaction>
@@ -167,9 +162,6 @@ LIST_REGCODES = """<transaction>
                    </transaction>"""
 
 # TODO:
-    # Add device without passcode
-    # Test an invalid transaction
     # Add pre-registration
     # Generate a Device/Token report
     # Delete by Device/Token
-

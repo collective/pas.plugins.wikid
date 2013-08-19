@@ -9,7 +9,9 @@ from functools import wraps
 from OpenSSL import *
 from xml.dom import minidom, Node
 
-from wauth import PING, CONNECT, LOGIN, REGISTRATION
+from wauth import\
+    (PING, CONNECT, REGISTRATION, LIST_USERS,
+     LOGIN, FIND_USER, DELETE, LIST_DOMAINS)
 
 __author__ = "Manish Rai Jain <manishrjain@gmail.com>"
 
@@ -26,6 +28,11 @@ def verify_cb(conn, cert, errnum, depth, ok):
 
 def prepare_xml_srting(s):
     return re.sub(r'\s+', ' ', s) + '\n'
+
+
+def get_tag_data(xmltree, tag_name, index=0):
+    """ It gets data from a tag """
+    return xmltree.getElementsByTagName(tag_name)[index].firstChild.data
 
 
 class pywClient:
@@ -148,9 +155,6 @@ class pywClient:
                            response, chap_password='null',
                            chap_challenge='null', wikid_challenge=None)
 
-    def getResponseState(self, response):
-        return response.getElementsByTagName("result")[0].firstChild.data
-
     def verify(self, format, user='null', domaincode='null', passcode='null',
                challenge='null', response='null', chap_password='null',
                chap_challenge='null', wikid_challenge='null'):
@@ -159,8 +163,7 @@ class pywClient:
         """
 
         message = LOGIN % locals()
-        result = self.getResponseState(self.xmlrequest(message))
-        return result == 'VALID'
+        return 'VALID' == get_tag_data(self.xmlrequest(message), 'result')
 
     def chapVerify(self, user=None, domaincode=None, chap_password=None,
                    chap_challenge=None, wikid_challenge=None):
@@ -174,8 +177,8 @@ class pywClient:
                            chap_password, chap_challenge, wikid_challenge)
 
     @assure_connection
-    def registerUsername(self, user=None, regcode=None, domaincode=None,
-                         passcode=None, group='null'):
+    def registerUsername(self, format, user=None, regcode=None, domaincode=None,
+                         passcode=None, group=None):
         """ This method creates an association between the userid and
             the device registered by the user.
         :param user: userid with which to associate device
@@ -192,12 +195,9 @@ class pywClient:
         :type passcode: string
         :example passcode: '260328'
         """
-
-        # TODO Add new device.
-        logger.info("Registering user ...")
-        format = "new"
+        logger.info("The user (%s) is being registered." % user)
         message = REGISTRATION % locals()
-        result = self.getResponseState(self.xmlrequest(message))
+        result = get_tag_data(self.xmlrequest(message), 'result')
         return result in ('SUCCESS', 'SUCESS')
 
     @assure_connection
@@ -207,13 +207,37 @@ class pywClient:
         """
         logger.info("Start Connection...")
         message = CONNECT % {'client': CLIENT_ID}
-        return self.getResponseState(self.xmlrequest(message)) == 'ACCEPT'
+        return get_tag_data(self.xmlrequest(message), 'result') == 'ACCEPT'
 
     def getDomains(self):
-        """ To be implemented. Has to be tested.
-           'getDomains: Still to be implemented'
-        """
-        message = """<transaction> <type>3</type> <data> <domain-list>null</domain-list> </data> </transaction>"""
+        """ Get all domains from the wikid server """
+        response = self.xmlrequest(LIST_DOMAINS)
+        return response.getElementsByTagName("domain-list")
+
+    def listUsers(self, domaincode=None):
+        """ List users that refer to the domain. """
+        message = LIST_USERS % locals()
         response = self.xmlrequest(message)
-        result = response.getElementsByTagName("domain-list")[0]
-        print result
+        return response.getElementsByTagName('user-id')
+
+    def login(
+            self, format, user, passcode, domaincode=None,
+            challenge=None, response=None,
+            chap_password=None, chap_challenge=None,
+    ):
+        """ Sign in to the wikid server """
+        message = LOGIN % locals()
+        return self.xmlrequest(message)
+
+    def findUser(self, user, domaincode, returncode):
+        """ It gets a lot of information about the user """
+        message = FIND_USER % locals()
+        return self.xmlrequest(message)
+
+    def deleteUser(self, user, domaincode, returncode):
+        """ Delete a user from the wikid server """
+        user_info = self.xmlrequest(FIND_USER % locals())
+        user_tag = user_info.getElementsByTagName('user')[0].toxml()
+        message = DELETE % locals()
+        result = get_tag_data(self.xmlrequest(message), 'result')
+        return result in ('SUCCESS', 'SUCESS')
