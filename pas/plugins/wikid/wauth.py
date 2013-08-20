@@ -162,7 +162,8 @@ REPORT = """<transaction>
 
 # Delete by Device/Token
 # FIXME: It hasn't been tested yet because it seems that
-# 'Delete by Device/Token'(XML) is invalidated. See: http://goo.gl/f4PjhU for details.
+# 'Delete by Device/Token'(the piece of XML) is invalidated.
+# See: http://goo.gl/f4PjhU for details.
 DELETE_BY_DEVICE_ID = """<transaction>
                              <type>13</type>
                              <data>
@@ -182,6 +183,7 @@ LIST_USERS = """<transaction>
                 </transaction>"""
 
 # List registration codes
+# FIXME:  The following piece of XML doesn't work.
 LIST_REGCODES = """<transaction>
                      <type>15</type>
                      <data>
