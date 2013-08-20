@@ -160,6 +160,18 @@ REPORT = """<transaction>
               </data>
             </transaction>"""
 
+# Delete by Device/Token
+# FIXME: It hasn't been tested yet because it seems that
+# 'Delete by Device/Token'(XML) is invalidated. See: http://goo.gl/f4PjhU for details.
+DELETE_BY_DEVICE_ID = """<transaction>
+                             <type>13</type>
+                             <data>
+                                <deviceID>%(device_id)s</deviceID>
+                                <result>null</result>
+                                <return-code>%(returncode)s</return-code>
+                             </data>
+                         </transaction>"""
+
 # List users in a domain
 LIST_USERS = """<transaction>
                     <type>14</type>
@@ -176,6 +188,3 @@ LIST_REGCODES = """<transaction>
                        <regCodeList />
                      </data>
                    </transaction>"""
-
-# TODO:
-    # Delete by Device/Token

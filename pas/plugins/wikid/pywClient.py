@@ -11,7 +11,8 @@ from xml.dom import minidom, Node
 
 from wauth import\
     (PING, CONNECT, REGISTRATION, LIST_USERS, ADD_PRE_REGISTRATION_CODE,
-     LOGIN, FIND_USER, DELETE, LIST_DOMAINS, PRE_REGISTRATION, REPORT)
+     LOGIN, FIND_USER, DELETE, LIST_DOMAINS, PRE_REGISTRATION, REPORT,
+     DELETE_BY_DEVICE_ID)
 
 __author__ = "Manish Rai Jain <manishrjain@gmail.com>"
 
@@ -272,3 +273,9 @@ class pywClient:
         message = REPORT % locals()
         response = self.xmlrequest(message)
         return get_tag_data(response, 'reportData')
+
+    def deleteDeviceById(self, device_id, returncode):
+        """ Delete a device by ID """
+        message = DELETE_BY_DEVICE_ID % locals()
+        response = self.xmlrequest(message)
+        return get_tag_data(response, 'result') in ('SUCCESS', 'SUCESS')
