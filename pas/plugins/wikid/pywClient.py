@@ -45,7 +45,7 @@ class pywClient:
             doc = minidom.parseString(response)
             return doc.documentElement
 
-    def assure_connection(f):
+    def __assure_connection(f):
         @wraps(f)
         def ensure_connection(self, *args, **kw):
             try:
@@ -55,12 +55,11 @@ class pywClient:
             return f(self, *args, **kw)
         return ensure_connection
 
-    @assure_connection
     def ping(self):
         """ Send a ping to the server, to make sure it's open """
         return self.xmlrequest(PING)
 
-    @assure_connection
+    @__assure_connection
     def checkCredentials(self, user='null', domaincode='null',
                          passcode='null', challenge='null', response='null'):
         """ This method returns a boolean representing successful or
@@ -104,7 +103,7 @@ class pywClient:
         return self.verify(user, format, domaincode, passcode, '', '',
                            chap_password, chap_challenge, wikid_challenge)
 
-    @assure_connection
+    @__assure_connection
     def registerUsername(self, format, user=None, regcode=None, domaincode=None,
                          passcode=None, group=None):
         """ This method creates an association between the userid and
@@ -128,7 +127,7 @@ class pywClient:
         result = get_tag_data(self.xmlrequest(message), 'result')
         return result in ('SUCCESS', 'SUCESS')
 
-    @assure_connection
+    @__assure_connection
     def connect(self):
         """ Authentication procedure completed.
            Start off connection with the server now.
@@ -137,17 +136,20 @@ class pywClient:
         message = CONNECT % {'client': CLIENT_ID}
         return get_tag_data(self.xmlrequest(message), 'result') == 'ACCEPT'
 
+    @__assure_connection
     def getDomains(self):
         """ Get all domains from the wikid server """
         response = self.xmlrequest(LIST_DOMAINS)
         return response.getElementsByTagName("domain-list")
 
+    @__assure_connection
     def listUsers(self, domaincode=None):
         """ List users that refer to the domain. """
         message = LIST_USERS % locals()
         response = self.xmlrequest(message)
         return response.getElementsByTagName('user-id')
 
+    @__assure_connection
     def login(
             self, format, user, passcode, domaincode=None,
             challenge=None, response=None,
@@ -157,11 +159,13 @@ class pywClient:
         message = LOGIN % locals()
         return self.xmlrequest(message)
 
+    @__assure_connection
     def findUser(self, user, domaincode, returncode):
         """ It gets a lot of information about the user """
         message = FIND_USER % locals()
         return self.xmlrequest(message)
 
+    @__assure_connection
     def deleteUser(self, user, domaincode, returncode):
         """ Delete a user from the wikid server """
         user_info = self.xmlrequest(FIND_USER % locals())
@@ -170,6 +174,7 @@ class pywClient:
         result = get_tag_data(self.xmlrequest(message), 'result')
         return result in ('SUCCESS', 'SUCESS')
 
+    @__assure_connection
     def addPreRegistrationCode(self, user, prereg_code, domaincode, override='false'):
         """ Add a pre-registration code for the future registration. """
         message = ADD_PRE_REGISTRATION_CODE % locals()
@@ -177,12 +182,14 @@ class pywClient:
         logger.info(get_tag_data(response, 'result-message'))
         return get_tag_data(response, 'result') == 'true'
 
+    @__assure_connection
     def preRegisterUser(self, regtoken, prereg_code, domaincode):
         """ Register a user using a pre-registration code """
         message = PRE_REGISTRATION % locals()
         response = self.xmlrequest(message)
         return get_tag_data(response, 'result') in ('SUCCESS', 'SUCESS')
 
+    @__assure_connection
     def getReport(
             self,
             data_type='USER',   # Another option: 'DEVICE'
@@ -198,6 +205,7 @@ class pywClient:
         response = self.xmlrequest(message)
         return get_tag_data(response, 'reportData')
 
+    @__assure_connection
     def deleteDeviceById(self, device_id, returncode):
         """ Delete a device by ID """
         message = DELETE_BY_DEVICE_ID % locals()
