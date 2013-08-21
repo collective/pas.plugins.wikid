@@ -16,8 +16,6 @@ from wauth import\
 
 from connection import SSLConnector
 
-__author__ = "Manish Rai Jain <manishrjain@gmail.com>"
-
 CLIENT_ID = "WiKID Python Client v4.0"
 
 logger = logging.getLogger(__name__)
