@@ -30,7 +30,7 @@ def get_tag_data(xmltree, tag_name, index=0):
     return xmltree.getElementsByTagName(tag_name)[index].firstChild.data
 
 
-class pywClient:
+class pywClient(object):
     def __init__(self, **ssl_settings):
         self.conn = SSLConnector(**ssl_settings)
 
