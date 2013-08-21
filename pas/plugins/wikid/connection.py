@@ -27,8 +27,8 @@ class SSLConnector(object):
         :type port: string
         :param pkey: A path to the PKCS12 certificate file
         :type pkey: string
-        :param passPhrase: a passphrase to open the PKCS12 file
-        :type passPhrase: string
+        :param pass_phrase: a passphrase to open the PKCS12 file
+        :type pass_phrase: string
         :param cacert: - a path to certificate for validating
             the WAS server certificate.
         :type cacert: string
