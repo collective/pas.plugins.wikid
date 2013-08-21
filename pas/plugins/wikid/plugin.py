@@ -81,7 +81,8 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
 
         if login is None or password is None:
             return None
-        res = w.checkCredentials(login, self.domaincode, password)
+        # check credentials using a wikid server
+        res = w.login(login, password, self.domaincode)
         if res is True:
             return login, login
         else:

@@ -58,50 +58,6 @@ class pywClient(object):
         return self.xmlrequest(PING)
 
     @__assure_connection
-    def checkCredentials(self, user='null', domaincode='null',
-                         passcode='null', challenge='null', response='null'):
-        """ This method returns a boolean representing successful or
-            unsuccessful authentication.
-        :param user: userid to validate credentials.
-        :type user: string
-        :param domaincode: the 12-digit code that represents the server/domain
-        :type domaincode: string
-        :param passcode: time-bounded, 1 use passcode.
-            It's a code which you get when you use a token client
-            (http://wikidsystems.com/downloads/token-clients).
-        :type passcode: string
-        :example passcode: '260328'
-        :param challenge: the challenge value provided to the user
-        :type challenge: string
-        :param response: the hashed/signed response from the device
-        :type response: string
-        """
-        return self.verify("base", user, domaincode, passcode, challenge,
-                           response, chap_password='null',
-                           chap_challenge='null', wikid_challenge=None)
-
-    def verify(self, format, user='null', domaincode='null', passcode='null',
-               challenge='null', response='null', chap_password='null',
-               chap_challenge='null', wikid_challenge='null'):
-        """ This helper method verifies credentials using
-           the specified mechanism
-        """
-
-        message = LOGIN % locals()
-        return 'VALID' == get_tag_data(self.xmlrequest(message), 'result')
-
-    def chapVerify(self, user=None, domaincode=None, chap_password=None,
-                   chap_challenge=None, wikid_challenge=None):
-
-        if wikidChallenge is None:
-            format = "chapOff"
-        else:
-            format = "chap"
-
-        return self.verify(user, format, domaincode, passcode, '', '',
-                           chap_password, chap_challenge, wikid_challenge)
-
-    @__assure_connection
     def registerUsername(self, format, user=None, regcode=None, domaincode=None,
                          passcode=None, group=None):
         """ This method creates an association between the userid and
@@ -149,13 +105,29 @@ class pywClient(object):
 
     @__assure_connection
     def login(
-            self, format, user, passcode, domaincode=None,
+            self, user, passcode, domaincode, format='base',
             challenge=None, response=None,
             chap_password=None, chap_challenge=None,
     ):
-        """ Sign in to the wikid server """
+        """ Sign in to the wikid server. This method returns
+            a boolean representing successful or unsuccessful authentication.
+        :param user: userid to validate credentials.
+        :type user: string
+        :param format: 'base' | 'chap' | 'chapoff' | 'offline'
+        :param domaincode: the 12-digit code that represents the server/domain
+        :type domaincode: string
+        :param passcode: time-bounded, 1 use passcode.
+            It's a code which you get when you use a token client
+            (http://wikidsystems.com/downloads/token-clients).
+        :type passcode: string
+        :example passcode: '260328'
+        :param challenge: the challenge value provided to the user
+        :type challenge: string
+        :param response: the hashed/signed response from the device
+        :type response: string
+        """
         message = LOGIN % locals()
-        return self.xmlrequest(message)
+        return 'VALID' == get_tag_data(self.xmlrequest(message), 'result')
 
     @__assure_connection
     def findUser(self, user, domaincode, returncode):
