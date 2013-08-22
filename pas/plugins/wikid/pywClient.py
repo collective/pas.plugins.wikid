@@ -27,9 +27,9 @@ def get_tag_data(xmltree, tag_name, index=0):
     return xmltree.getElementsByTagName(tag_name)[index].firstChild.data
 
 
-class pywClient(SSLConnector):
+class WikidClient(SSLConnector):
     def __init__(self, **ssl_settings):
-        super(pywClient, self).__init__(**ssl_settings)
+        super(WikidClient, self).__init__(**ssl_settings)
 
     def xmlrequest(self, message):
         """ Send XML request over the socket and return the XML response.
