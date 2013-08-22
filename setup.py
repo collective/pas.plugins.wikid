@@ -19,7 +19,7 @@ long_description = (
     + '\n' +
     read('docs', 'CHANGES.txt'))
 
-tests_require = ['zope.testing'']
+tests_require = ['zope.testing']
 
 setup(name='pas.plugins.wikid',
       version=version,
