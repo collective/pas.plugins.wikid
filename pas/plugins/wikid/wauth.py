@@ -180,10 +180,9 @@ LIST_USERS = """<transaction>
                 </transaction>"""
 
 # List registration codes
-# FIXME:  The following piece of XML doesn't work.
 LIST_REGCODES = """<transaction>
                      <type>15</type>
                      <data>
-                       <regCodeList />
+                       <regCodeList/>
                      </data>
                    </transaction>"""

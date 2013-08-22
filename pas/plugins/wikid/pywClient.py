@@ -9,7 +9,7 @@ from OpenSSL import SSL
 from wauth import\
     (PING, CONNECT, REGISTRATION, LIST_USERS, ADD_PRE_REGISTRATION_CODE,
      LOGIN, FIND_USER, DELETE, LIST_DOMAINS, PRE_REGISTRATION, REPORT,
-     DELETE_BY_DEVICE_ID)
+     DELETE_BY_DEVICE_ID, LIST_REGCODES)
 
 from connection import SSLConnector
 
@@ -178,3 +178,9 @@ class pywClient(object):
         message = DELETE_BY_DEVICE_ID % locals()
         response = self.xmlrequest(message)
         return get_tag_data(response, 'result') in ('SUCCESS', 'SUCESS')
+
+    @__assure_connection
+    def listRegCodes(self):
+        """ List registration codes """
+        response = self.xmlrequest(LIST_REGCODES)
+        return response.getElementsByTagName('registrationCode')
