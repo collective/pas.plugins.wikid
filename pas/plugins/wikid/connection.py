@@ -93,7 +93,7 @@ class SSLConnector(object):
                 chunk = self.socket.recv(8192)
                 if chunk:
                     response += chunk
-                # The wikid server sends messages that are separated by '\n'
+                # The wikid server sends chunk that is separated by '\n'
                 if '</transaction>' in response:
                     break
         logger.debug('Response received: ' + response)
