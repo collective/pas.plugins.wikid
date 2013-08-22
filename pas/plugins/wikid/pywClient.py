@@ -1,13 +1,10 @@
-''' wClient.py
-Python Client for wikid '''
+""" The client for wikid """
 
 import re
-import socket
 import logging
-from select import select
 from functools import wraps
-from OpenSSL import *
-from xml.dom import minidom, Node
+from xml.dom import minidom
+from OpenSSL import SSL
 
 from wauth import\
     (PING, CONNECT, REGISTRATION, LIST_USERS, ADD_PRE_REGISTRATION_CODE,
