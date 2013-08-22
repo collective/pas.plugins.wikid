@@ -57,8 +57,8 @@ class WikidClient(SSLConnector):
         return self.xmlrequest(PING)
 
     @__assure_connection
-    def registerUsername(self, format, user=None, regcode=None, domaincode=None,
-                         passcode=None, group=None):
+    def registerUsername(self, user, regcode, domaincode,
+                         format='new', passcode=None, group=None):
         """ This method creates an association between the userid and
             the device registered by the user.
         :param user: userid with which to associate device
