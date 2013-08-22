@@ -81,25 +81,20 @@ class SSLConnector(object):
     def request(self, message):
         """ Send request over the socket and return the response.
         """
-        timeout = 2
-        response = ''
-
         logger.debug('Sending request: ' + message)
         sent = self.socket.send(message)
         if sent == 0:
             raise RuntimeError("socket connection broken")
-
-        self.socket.setblocking(0)
-        ready = select([self.socket], [], [], timeout)
+        ready = select([self.socket], [], [])
+        response = ''
         if ready[0]:
-            while not response.endswith("\n"):
-                try:
-                    chunk = self.socket.recv(8192)
-                except SSL.WantReadError:
-                    continue
+            while True:
+                # See for details: http://docs.python.org/2/library/socket.html#socket.socket.recv
+                chunk = self.socket.recv(8192)
                 if chunk:
-                    response = response + chunk
-                else:
+                    response += chunk
+                # The wikid server sends messages that are separated by '\n'
+                if '</transaction>' in response:
                     break
         logger.debug('Response received: ' + response)
         return response
