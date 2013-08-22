@@ -14,6 +14,8 @@ from wauth import\
 from connection import SSLConnector
 
 CLIENT_ID = "WiKID Python Client v4.0"
+# We can see 'SUCCESS' and 'SUCESS' in docs
+SUCCESS_STATUS = ('SUCCESS', 'SUCESS')
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +78,7 @@ class WikidClient(SSLConnector):
         logger.info("The user (%s) is being registered." % user)
         message = REGISTRATION % locals()
         result = get_tag_data(self.xmlrequest(message), 'result')
-        return result in ('SUCCESS', 'SUCESS')
+        return result in SUCCESS_STATUS
 
     @__assure_connection
     def connect(self):
@@ -139,7 +141,7 @@ class WikidClient(SSLConnector):
         user_tag = user_info.getElementsByTagName('user')[0].toxml()
         message = DELETE % locals()
         result = get_tag_data(self.xmlrequest(message), 'result')
-        return result in ('SUCCESS', 'SUCESS')
+        return result in SUCCESS_STATUS
 
     @__assure_connection
     def addPreRegistrationCode(self, user, prereg_code, domaincode, override='false'):
@@ -154,7 +156,7 @@ class WikidClient(SSLConnector):
         """ Register a user using a pre-registration code """
         message = PRE_REGISTRATION % locals()
         response = self.xmlrequest(message)
-        return get_tag_data(response, 'result') in ('SUCCESS', 'SUCESS')
+        return get_tag_data(response, 'result') in SUCCESS_STATUS
 
     @__assure_connection
     def getReport(
@@ -177,7 +179,7 @@ class WikidClient(SSLConnector):
         """ Delete a device by ID """
         message = DELETE_BY_DEVICE_ID % locals()
         response = self.xmlrequest(message)
-        return get_tag_data(response, 'result') in ('SUCCESS', 'SUCESS')
+        return get_tag_data(response, 'result') in SUCCESS_STATUS
 
     @__assure_connection
     def listRegCodes(self):
