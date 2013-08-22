@@ -161,9 +161,6 @@ REPORT = """<transaction>
             </transaction>"""
 
 # Delete by Device/Token
-# FIXME: It hasn't been tested yet because it seems that
-# 'Delete by Device/Token'(the piece of XML) is invalidated.
-# See: http://goo.gl/f4PjhU for details.
 DELETE_BY_DEVICE_ID = """<transaction>
                              <type>13</type>
                              <data>
