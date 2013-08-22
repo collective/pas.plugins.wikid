@@ -51,21 +51,24 @@ class SSLConnector(object):
 
         self.sslcontext.use_privatekey(pkeyObj)
         self.sslcontext.use_certificate(x509Obj)
-        # create a connection
         self.setUpSocket()
 
     def setUpSocket(self):
-        """ Create a socket connection """
+        """ Create a socket """
         self.socket = SSL.Connection(
             self.sslcontext, socket.socket(socket.AF_INET, socket.SOCK_STREAM))
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    def setUpConnection(self):
+        """ Create a socket connection """
+        self.setUpSocket()
         logger.debug("Connecting...")
         self.socket.connect((self.host, self.port))
         logger.debug("Connected. Trying Handshake...")
         self.socket.do_handshake()
         logger.debug("Handshaking done.")
 
-    def closeSocket(self):
+    def closeConnection(self):
         """ Close a socket connection
             See for details: http://docs.python.org/2/howto/sockets.html#disconnecting
         """
@@ -75,7 +78,7 @@ class SSLConnector(object):
             pass
         self.socket.close()
 
-    def send(self, message):
+    def request(self, message):
         """ Send request over the socket and return the response.
         """
         timeout = 2
@@ -103,5 +106,5 @@ class SSLConnector(object):
 
     def reconnect(self):
         """ Recreate a socket connection """
-        self.closeSocket()
-        self.setUpSocket()
+        self.closeConnection()
+        self.setUpConnection()

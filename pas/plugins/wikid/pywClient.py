@@ -27,15 +27,15 @@ def get_tag_data(xmltree, tag_name, index=0):
     return xmltree.getElementsByTagName(tag_name)[index].firstChild.data
 
 
-class pywClient(object):
+class pywClient(SSLConnector):
     def __init__(self, **ssl_settings):
-        self.conn = SSLConnector(**ssl_settings)
+        super(pywClient, self).__init__(**ssl_settings)
 
     def xmlrequest(self, message):
         """ Send XML request over the socket and return the XML response.
         """
         message = prepare_xml_srting(message)
-        response = self.conn.send(message)
+        response = self.request(message)
         if response:
             doc = minidom.parseString(response)
             return doc.documentElement
@@ -46,7 +46,7 @@ class pywClient(object):
             try:
                 self.xmlrequest(prepare_xml_srting(PING))
             except SSL.Error:
-                self.conn.reconnect()
+                self.reconnect()
             return f(self, *args, **kw)
         return ensure_connection
 
