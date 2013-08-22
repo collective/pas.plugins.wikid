@@ -3,7 +3,7 @@
 import csv
 import logging
 import StringIO
-import unittest2 as unittest
+import unittest
 
 from pas.plugins.wikid.client import WikidClient, get_tag_data
 
@@ -106,8 +106,8 @@ class TestWikidClient(unittest.TestCase):
         self.assertTrue(
             self.client.login(
                 USER,
-                DOMAINCODE,
                 PASSCODE,
+                DOMAINCODE
             )
         )
 
@@ -213,6 +213,12 @@ class TestWikidClient(unittest.TestCase):
 #        )
 
 
+def test_suite():
+    """ Gather all the tests from this module in a test suite. """
+    test_suite = unittest.TestSuite()
+    test_suite.addTest(unittest.makeSuite(TestWikidClient))
+    return test_suite
+
 if __name__ == '__main__':
     # Set up the logging level for testing.
     logger = logging.getLogger('pas.plugins.wikid.connection')
@@ -223,5 +229,6 @@ if __name__ == '__main__':
     # See details: http://docs.python.org/2/library/unittest.html#unittest.TestCase.setUpClass
     TestWikidClient.setUpClass()
     # Run tests
-    unittest.main()
+    runner = unittest.TextTestRunner()
+    runner.run(test_suite())
     TestWikidClient.tearDownClass()
