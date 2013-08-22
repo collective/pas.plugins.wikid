@@ -1,5 +1,5 @@
 """ It's dedicated to testing purposes """
-from .pywClient import pywClient
+from .client import WikidClient
 
 # You should set up input parameters (host, username, etc.) for this test.
 # So, before executing this example you have to:
@@ -10,7 +10,7 @@ from .pywClient import pywClient
 #  it's you 'regcode' (see the method -'registerUsername' for details).
 #  Push "Get Passcode" and you will get 'passcode' (see the method - 'checkCredentials' for details)
 #  3) Fill in other parameters.
-w = pywClient(host='127.0.0.1', port=8388, pkey='localhost.p12',
+w = WikidClient(host='127.0.0.1', port=8388, pkey='localhost.p12',
               passPhrase='secret', caCert='WiKID-ca.pem')
 w.startConnection()
 # You will not verify your user if it's not registered.

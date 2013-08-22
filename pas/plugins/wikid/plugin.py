@@ -26,7 +26,7 @@ from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlug
 from Products.CMFCore.permissions import ManagePortal
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from  pywClient import pywClient
+from  client import WikidClient
 
 
 class WiKIDAuthPlugin(BasePlugin, Cacheable):
@@ -73,7 +73,7 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
         password = credentials.get('password')
 
         try:
-            w = pywClient(host=self.wikid_host, port=self.wikid_port,
+            w = WikidClient(host=self.wikid_host, port=self.wikid_port,
                         pkey=self.pkey, passPhrase=self.passPhrase,
                         caCert=self.caCert)
         except:
@@ -105,7 +105,7 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
             if not os.path.exists(caCert):
                 return msg + " Cannot access to '%s' No such file." % caCert
             try:
-                pywClient(host=wikid_host, port=wikid_port, pkey=pkey,
+                WikidClient(host=wikid_host, port=wikid_port, pkey=pkey,
                           passPhrase=passPhrase, caCert=caCert)
             except:
                 return msg + " WIKID Client error. Check certificates."
