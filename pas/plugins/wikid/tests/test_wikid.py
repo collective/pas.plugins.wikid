@@ -39,7 +39,7 @@ class BaseLayer:
 
     @classmethod
     def tearDown(cls):
-        TestWikidClient.tearDownClass
+        TestWikidClient.tearDownClass()
 
 
 class TestWikidClient(unittest.TestCase):
