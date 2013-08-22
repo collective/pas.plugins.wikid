@@ -19,10 +19,7 @@ long_description = (
     + '\n' +
     read('docs', 'CHANGES.txt'))
 
-# BBB: unittest2 for Python < 2.7.
-# It's useful because it has setUpClass and tearDownClass.
-# See pas/plugins/wikid/tests/test_wikid.py for details.
-tests_require = ['zope.testing', 'unittest2']
+tests_require = ['zope.testing'']
 
 setup(name='pas.plugins.wikid',
       version=version,
