@@ -74,8 +74,8 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
 
         try:
             w = WikidClient(host=self.wikid_host, port=self.wikid_port,
-                            pkey=self.pkey, passPhrase=self.passPhrase,
-                            caCert=self.caCert)
+                            pkey=self.pkey, pass_phrase=self.passPhrase,
+                            cacert=self.caCert)
         except:
             return None
 
@@ -106,7 +106,7 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
                 return msg + " Cannot access to '%s' No such file." % caCert
             try:
                 WikidClient(host=wikid_host, port=wikid_port, pkey=pkey,
-                            passPhrase=passPhrase, caCert=caCert)
+                            pass_phrase=passPhrase, cacert=caCert)
             except:
                 return msg + " WIKID Client error. Check certificates."
 
