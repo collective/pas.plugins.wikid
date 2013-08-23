@@ -5,7 +5,8 @@ from Products.PluggableAuthService import registerMultiPlugin
 import plugin
 
 
-manage_addWiKIDAuthPluginForm = PageTemplateFile('www/wikidAdd', globals(), __name__='manage_addWiKIDAuthPluginForm')
+manage_addWiKIDAuthPluginForm = PageTemplateFile(
+    'www/wikidAdd', globals(), __name__='manage_addWiKIDAuthPluginForm')
 
 
 def manage_addWiKIDAuthPlugin(dispatcher, id, title=None, REQUEST=None):

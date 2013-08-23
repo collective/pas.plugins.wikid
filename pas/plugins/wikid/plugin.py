@@ -26,7 +26,7 @@ from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlug
 from Products.CMFCore.permissions import ManagePortal
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
-from  client import WikidClient
+from client import WikidClient
 
 
 class WiKIDAuthPlugin(BasePlugin, Cacheable):
@@ -61,7 +61,7 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
     #
     #   IAuthenticationPlugin implementation
     #
-    #security.declarePrivate('authenticateCredentials')
+    # security.declarePrivate('authenticateCredentials')
     def authenticateCredentials(self, credentials):
 
         """ See IAuthenticationPlugin.
@@ -74,8 +74,8 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
 
         try:
             w = WikidClient(host=self.wikid_host, port=self.wikid_port,
-                        pkey=self.pkey, passPhrase=self.passPhrase,
-                        caCert=self.caCert)
+                            pkey=self.pkey, passPhrase=self.passPhrase,
+                            caCert=self.caCert)
         except:
             return None
 
@@ -101,12 +101,12 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
             except ValueError:
                 return msg + "  'Port' must be an integer."
             if not os.path.exists(pkey):
-                return  msg + " Cannot access to '%s' No such file." % pkey
+                return msg + " Cannot access to '%s' No such file." % pkey
             if not os.path.exists(caCert):
                 return msg + " Cannot access to '%s' No such file." % caCert
             try:
                 WikidClient(host=wikid_host, port=wikid_port, pkey=pkey,
-                          passPhrase=passPhrase, caCert=caCert)
+                            passPhrase=passPhrase, caCert=caCert)
             except:
                 return msg + " WIKID Client error. Check certificates."
 
