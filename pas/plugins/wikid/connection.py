@@ -51,7 +51,6 @@ class SSLConnector(object):
 
         self.sslcontext.use_privatekey(pkeyObj)
         self.sslcontext.use_certificate(x509Obj)
-        self.setUpSocket()
 
     def setUpSocket(self):
         """ Create a socket """
