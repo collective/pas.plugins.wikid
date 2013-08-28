@@ -12,7 +12,7 @@ manage_addWiKIDAuthPluginForm = PageTemplateFile(
 def manage_addWiKIDAuthPlugin(dispatcher, id, title=None, REQUEST=None):
     """ Add a WiKIDAuthPlugin to a Pluggable Auth Service. """
 
-    obj = plugin.WiKIDAuthPlugin(id, title)
+    obj = plugin.WiKIDAuthMultiPlugin(id, title)
     dispatcher._setObject(obj.getId(), obj)
 
     if REQUEST is not None:
@@ -24,14 +24,14 @@ def manage_addWiKIDAuthPlugin(dispatcher, id, title=None, REQUEST=None):
 
 def register_wikid_plugin():
     try:
-        registerMultiPlugin(plugin.WiKIDAuthPlugin.meta_type)
+        registerMultiPlugin(plugin.WiKIDAuthMultiPlugin.meta_type)
     except RuntimeError:
         # make refresh users happy
         pass
 
 
 def register_wikid_plugin_class(context):
-    context.registerClass(plugin.WiKIDAuthPlugin,
+    context.registerClass(plugin.WiKIDAuthMultiPlugin,
                           permission=manage_users,
                           constructors=(manage_addWiKIDAuthPluginForm,
                                         manage_addWiKIDAuthPlugin),
