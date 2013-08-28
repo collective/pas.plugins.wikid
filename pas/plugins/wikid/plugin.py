@@ -14,27 +14,28 @@ info at wikidsystems.com
 """
 
 import os
+from Globals import InitializeClass
+from OFS.Cache import Cacheable
 from AccessControl import ClassSecurityInfo
 from AccessControl.requestmethod import postonly
 
-from Globals import InitializeClass
-from OFS.Cache import Cacheable
-
-from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
-from Products.PluggableAuthService.utils import classImplements
-from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin
 from Products.CMFCore.permissions import ManagePortal
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from Products.PluggableAuthService.utils import classImplements
+from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
+from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin
 
-from client import WikidClient
+from pas.plugins.wikid.client import WikidClient
+from pas.plugins.wikid.plugins.auth import AuthPlugin
+from pas.plugins.wikid.plugins.base import WiKIDBasePlugin
 
 
-class WiKIDAuthPlugin(BasePlugin, Cacheable):
+class WiKIDAuthMultiPlugin(WiKIDBasePlugin, AuthPlugin):
 
     """ PAS plugin for using WiKID credentials to log in.
     """
 
-    meta_type = 'WiKIDAuthPlugin'
+    meta_type = 'WiKID Auth Multi Plugin'
 
     security = ClassSecurityInfo()
 
@@ -47,46 +48,6 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
     security.declareProtected(ManagePortal, 'manage_config')
     manage_config = PageTemplateFile('www/config', globals(),
                                      __name__='manage_config')
-
-    def __init__(self, id, title=None):
-        self._id = self.id = id
-        self.title = title
-        self.wikid_port = 8388
-        self.wikid_host = "127.0.0.1"
-        self.domaincode = '127000000001'
-        self.passPhrase = 'passphrase'
-        self.caCert = ''
-        self.pkey = ''
-
-    #
-    #   IAuthenticationPlugin implementation
-    #
-    # security.declarePrivate('authenticateCredentials')
-    def authenticateCredentials(self, credentials):
-
-        """ See IAuthenticationPlugin.
-
-        o We expect the credentials to be those returned by
-          ILoginPasswordExtractionPlugin.
-        """
-        login = credentials.get('login')
-        password = credentials.get('password')
-
-        try:
-            w = WikidClient(host=self.wikid_host, port=self.wikid_port,
-                            pkey=self.pkey, pass_phrase=self.passPhrase,
-                            cacert=self.caCert)
-        except:
-            return None
-
-        if login is None or password is None:
-            return None
-        # check credentials using a wikid server
-        res = w.login(login, password, self.domaincode)
-        if res is True:
-            return login, login
-        else:
-            print None
 
     security.declareProtected(ManagePortal, 'manage_updateConfig')
     @postonly
@@ -134,7 +95,6 @@ class WiKIDAuthPlugin(BasePlugin, Cacheable):
                               (self.absolute_url(),
                                err + ' Configuration+NOT+updated.'))
 
+classImplements(WiKIDAuthMultiPlugin, IAuthenticationPlugin)
 
-classImplements(WiKIDAuthPlugin, IAuthenticationPlugin)
-
-InitializeClass(WiKIDAuthPlugin)
+InitializeClass(WiKIDAuthMultiPlugin)
