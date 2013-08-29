@@ -95,6 +95,4 @@ class WiKIDAuthMultiPlugin(WiKIDBasePlugin, AuthPlugin):
                               (self.absolute_url(),
                                err + ' Configuration+NOT+updated.'))
 
-classImplements(WiKIDAuthMultiPlugin, IAuthenticationPlugin)
-
 InitializeClass(WiKIDAuthMultiPlugin)

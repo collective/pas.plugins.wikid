@@ -1,5 +1,7 @@
 import logging
 from AccessControl import ClassSecurityInfo
+from zope.interface import implements
+from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin
 
 logger = logging.getLogger("pas.plugins.wikid.auth")
 
@@ -7,6 +9,7 @@ logger = logging.getLogger("pas.plugins.wikid.auth")
 class AuthPlugin(object):
     """ Implements IAuthenticationPlugin
     """
+    implements(IAuthenticationPlugin)
     meta_type = 'WiKID Auth Plugin'
     security = ClassSecurityInfo()
 
