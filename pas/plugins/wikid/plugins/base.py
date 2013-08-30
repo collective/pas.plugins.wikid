@@ -30,17 +30,14 @@ class WiKIDBasePlugin(BasePlugin):
     def _getWikidConnection(self):
         # '_v_connector' will not be persisted due to '_v_'
         if not hasattr(self, '_v_connector'):
-            try:
-                self._v_connector = WikidClient(
-                    host=self.wikid_host,
-                    port=self.wikid_port,
-                    pkey=self.pkey,
-                    pass_phrase=self.passPhrase,
-                    cacert=self.caCert
-                )
-                self._v_connector.setUpConnection()
-            except:
-                return None
+            self._v_connector = WikidClient(
+                host=self.wikid_host,
+                port=self.wikid_port,
+                pkey=self.pkey,
+                pass_phrase=self.passPhrase,
+                cacert=self.caCert
+            )
+            self._v_connector.setUpConnection()
         return self._v_connector
 
 InitializeClass(WiKIDBasePlugin)
