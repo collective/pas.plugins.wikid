@@ -20,21 +20,21 @@ Plugin setup
 
 pas.plugins.wikid should be in the list of installable plugins:
 
-    >>> 'WiKIDAuthPlugin' in select.displayOptions
+    >>> 'WiKID Auth Multi Plugin' in select.displayOptions
     True
 
 and we can select it:
 
-    >>> select.getControl('WiKIDAuthPlugin').click()
+    >>> select.getControl('WiKID Auth Multi Plugin').click()
     >>> select.displayValue
-    ['WiKIDAuthPlugin']
+    ['WiKID Auth Multi Plugin']
     >>> select.value
     ['manage_addProduct/pas.plugins.wikid/manage_addWiKIDAuthPluginForm']
 
-we add 'WiKIDAuthPlugin' to acl_users:
+we add 'WiKID Auth Multi Plugin' to acl_users:
 
-    >>> from pas.plugins.wikid.plugin import WiKIDAuthPlugin
-    >>> myhelper = ('myplugin', 'WiKIDAuthPlugin')
+    >>> from pas.plugins.wikid.plugin import WiKIDAuthMultiPlugin
+    >>> myhelper = ('myplugin', 'WiKIDAuthMultiPlugin')
     >>> self.portal.acl_users['myplugin'] = myhelper
 
 and so on. Continue your tests here
