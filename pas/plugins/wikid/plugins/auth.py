@@ -1,9 +1,6 @@
-import logging
 from AccessControl import ClassSecurityInfo
 from zope.interface import implements
 from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin, IExtractionPlugin
-
-logger = logging.getLogger("pas.plugins.wikid.auth")
 
 
 # TODO: rewrite it
