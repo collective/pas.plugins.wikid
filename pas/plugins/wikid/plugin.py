@@ -28,9 +28,10 @@ from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlug
 from pas.plugins.wikid.client import WikidClient
 from pas.plugins.wikid.plugins.auth import AuthPlugin
 from pas.plugins.wikid.plugins.base import WiKIDBasePlugin
+from pas.plugins.wikid.plugins.enumeration import UserEnumerator
 
 
-class WiKIDAuthMultiPlugin(WiKIDBasePlugin, AuthPlugin):
+class WiKIDAuthMultiPlugin(WiKIDBasePlugin, AuthPlugin, UserEnumerator):
 
     """ PAS plugin for using WiKID credentials to log in.
     """
