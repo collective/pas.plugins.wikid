@@ -39,5 +39,3 @@ class AuthPlugin(object):
         result = connector.login(login, password, self.domaincode)
         if result is True:
             return login, login
-        else:
-            print None
