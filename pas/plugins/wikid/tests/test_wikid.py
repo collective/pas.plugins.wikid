@@ -127,7 +127,7 @@ class TestWikidClient(unittest.TestCase):
             next(
                 user
                 for user in users
-                if user.firstChild.data == USER
+                if user == USER
             )
         )
 

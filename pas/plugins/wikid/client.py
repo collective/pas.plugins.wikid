@@ -100,7 +100,7 @@ class WikidClient(SSLConnector):
         """ List users that refer to the domain. """
         message = LIST_USERS % locals()
         response = self.xmlrequest(message)
-        return response.getElementsByTagName('user-id')
+        return (user.firstChild.data for user in response.getElementsByTagName('user-id'))
 
     @__assure_connection
     def login(
