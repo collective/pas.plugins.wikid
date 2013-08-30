@@ -1,6 +1,5 @@
 import os
 from Globals import InitializeClass
-from OFS.Cache import Cacheable
 from AccessControl import ClassSecurityInfo
 from AccessControl.requestmethod import postonly
 
@@ -11,7 +10,7 @@ from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from pas.plugins.wikid.client import WikidClient
 
 
-class WiKIDBasePlugin(BasePlugin, Cacheable):
+class WiKIDBasePlugin(BasePlugin):
 
     meta_type = 'WiKIDBasePlugin'
     security = ClassSecurityInfo()
