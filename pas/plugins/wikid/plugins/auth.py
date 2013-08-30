@@ -3,7 +3,6 @@ from zope.interface import implements
 from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin, IExtractionPlugin
 
 
-# TODO: rewrite it
 class AuthPlugin(object):
     """ It's a mixin for WiKIDAuthMultiPlugin
     """

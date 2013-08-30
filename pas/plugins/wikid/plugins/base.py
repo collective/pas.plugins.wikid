@@ -1,21 +1,15 @@
-import os
 from Globals import InitializeClass
 from AccessControl import ClassSecurityInfo
-from AccessControl.requestmethod import postonly
-
-from Products.CMFCore.permissions import ManagePortal
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 
 from pas.plugins.wikid.client import WikidClient
 
 
 class WiKIDBasePlugin(BasePlugin):
-
+    """ It's a mixin for WiKIDAuthMultiPlugin
+    """
     meta_type = 'WiKIDBasePlugin'
     security = ClassSecurityInfo()
-
-    security.declarePrivate('_getWikidConnection')
 
     def __init__(self, id, title=None):
         self._id = self.id = id
@@ -26,6 +20,8 @@ class WiKIDBasePlugin(BasePlugin):
         self.passPhrase = 'passphrase'
         self.caCert = ''
         self.pkey = ''
+
+    security.declarePrivate('_getWikidConnection')
 
     def _getWikidConnection(self):
         # '_v_connector' will not be persisted due to '_v_'

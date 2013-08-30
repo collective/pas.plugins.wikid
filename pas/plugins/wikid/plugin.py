@@ -15,15 +15,12 @@ info at wikidsystems.com
 
 import os
 from Globals import InitializeClass
-from OFS.Cache import Cacheable
 from AccessControl import ClassSecurityInfo
 from AccessControl.requestmethod import postonly
 
 from Products.CMFCore.permissions import ManagePortal
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from Products.PluggableAuthService.utils import classImplements
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
-from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin
 
 from pas.plugins.wikid.client import WikidClient
 from pas.plugins.wikid.plugins.auth import AuthPlugin
@@ -43,14 +40,14 @@ class WiKIDAuthMultiPlugin(WiKIDBasePlugin, AuthPlugin, UserEnumerator):
     # ZMI tab for configuration page
     manage_options = (({'label': 'Configuration',
                         'action': 'manage_config'},)
-                      + BasePlugin.manage_options
-                      + Cacheable.manage_options)
+                      + BasePlugin.manage_options)
 
     security.declareProtected(ManagePortal, 'manage_config')
     manage_config = PageTemplateFile('www/config', globals(),
                                      __name__='manage_config')
 
     security.declareProtected(ManagePortal, 'manage_updateConfig')
+
     @postonly
     def manage_updateConfig(self, REQUEST):
         """Update configuration of Trusted Proxy Authentication Plugin.
