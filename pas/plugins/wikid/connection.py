@@ -63,10 +63,15 @@ class SSLConnector(object):
         """ Create a socket connection """
         self.setUpSocket()
         logger.debug("Connecting...")
-        self.socket.connect((self.host, self.port))
-        logger.debug("Connected. Trying Handshake...")
-        self.socket.do_handshake()
-        logger.debug("Handshaking done.")
+        try:
+            self.socket.connect((self.host, self.port))
+        except socket.error as e:
+            logger.exception(e)
+        else:
+            logger.debug("Connected. Trying Handshake...")
+            self.socket.do_handshake()
+            logger.debug("Handshaking done.")
+            return True
 
     def closeConnection(self):
         """ Close a socket connection
@@ -82,9 +87,11 @@ class SSLConnector(object):
         """ Send request over the socket and return the response.
         """
         logger.debug('Sending request: ' + message)
-        sent = self.socket.send(message)
-        if sent == 0:
-            raise RuntimeError("socket connection broken")
+        try:
+            self.socket.send(message)
+        except SSL.Error as e:
+            logger.exception(e)
+            return False
         ready = select([self.socket], [], [])
         response = ''
         if ready[0]:
@@ -102,4 +109,4 @@ class SSLConnector(object):
     def reconnect(self):
         """ Recreate a socket connection """
         self.closeConnection()
-        self.setUpConnection()
+        return self.setUpConnection()
