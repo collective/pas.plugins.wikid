@@ -6,11 +6,12 @@ from AccessControl.requestmethod import postonly
 from Products.CMFCore.permissions import ManagePortal
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
+from OFS.Cache import Cacheable
 
 from pas.plugins.wikid.client import WikidClient
 
 
-class WiKIDBasePlugin(BasePlugin):
+class WiKIDBasePlugin(BasePlugin, Cacheable):
     """ It's a mixin for WiKIDAuthMultiPlugin
     """
     meta_type = 'WiKIDBasePlugin'
@@ -20,7 +21,8 @@ class WiKIDBasePlugin(BasePlugin):
     # ZMI tab for configuration page
     manage_options = (({'label': 'Configuration',
                         'action': 'manage_config'},)
-                      + BasePlugin.manage_options)
+                      + BasePlugin.manage_options
+                      + Cacheable.manage_options)
 
     security.declareProtected(ManagePortal, 'manage_config')
     manage_config = PageTemplateFile('../www/config', globals(),

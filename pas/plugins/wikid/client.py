@@ -45,11 +45,12 @@ class WikidClient(SSLConnector):
     def __assure_connection(f):
         @wraps(f)
         def ensure_connection(self, *args, **kw):
-            try:
-                self.xmlrequest(prepare_xml_srting(PING))
-            except SSL.Error:
-                self.reconnect()
-            return f(self, *args, **kw)
+            # first attempt
+            if self.xmlrequest(prepare_xml_srting(PING)):
+                return f(self, *args, **kw)
+            # second attempt
+            elif self.reconnect():
+                return f(self, *args, **kw)
         return ensure_connection
 
     def ping(self):
