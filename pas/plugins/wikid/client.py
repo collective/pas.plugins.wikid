@@ -26,7 +26,9 @@ def prepare_xml_srting(s):
 
 def get_tag_data(xmltree, tag_name, index=0):
     """ It gets data from a tag """
-    return xmltree.getElementsByTagName(tag_name)[index].firstChild.data
+    tags = xmltree.getElementsByTagName(tag_name)
+    if len(tags) > index:
+        return tags[index].firstChild.data
 
 
 class WikidClient(SSLConnector):
