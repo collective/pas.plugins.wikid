@@ -11,7 +11,7 @@ from pas.plugins.wikid.client import WikidClient, get_tag_data
 # Please set up this options for testing. See 'pas/plugins/wikid/example.py' for details.
 # Options that refer to a wikid server.
 HOST = '127.0.0.1'
-DOMAINCODE = '127000000001'
+DOMAINCODE = u'127000000001'
 PORT = 8388
 PKEY = 'localhost.p12'
 WIKID_SERVER_PASSCODE = 'secret'
@@ -163,7 +163,7 @@ class TestWikidClient(unittest.TestCase):
             next(
                 domain
                 for domain in domains
-                if get_tag_data(domain, 'domaincode') == DOMAINCODE
+                if domain == DOMAINCODE
             )
         )
 

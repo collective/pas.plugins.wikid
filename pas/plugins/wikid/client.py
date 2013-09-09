@@ -96,7 +96,10 @@ class WikidClient(SSLConnector):
     def getDomains(self):
         """ Get all domains from the wikid server """
         response = self.xmlrequest(LIST_DOMAINS)
-        return response.getElementsByTagName("domain-list")
+        return (
+            get_tag_data(domain, 'domaincode')
+            for domain in response.getElementsByTagName('domain')
+        )
 
     @__assure_connection
     def listUsers(self, domaincode=None):
