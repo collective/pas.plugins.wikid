@@ -20,9 +20,10 @@ class UserEnumerator(object):
         """ Get users from a wikid server """
         connector = self._getWikidConnection()
         for user in connector.listUsers(self.domaincode):
+            userid = user.encode()
             yield {
-                'id': user,
-                'login': user,
+                'id': userid,
+                'login': userid,
                 'pluginid': self.getId()
             }
 
