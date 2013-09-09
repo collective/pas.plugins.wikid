@@ -87,14 +87,14 @@ class SSLConnector(object):
         """ Send request over the socket and return the response.
         """
         logger.debug('Sending request: ' + message)
-        self.socket.setblocking(0)
-        # wait for the first data in socket
-        ready = select([self.socket], [], [], timeout)
         try:
             self.socket.send(message)
         except SSL.Error as e:
             logger.exception(e)
             return False
+        self.socket.setblocking(0)
+        # wait for the first data in socket
+        ready = select([self.socket], [], [], timeout)
         response = ''
         if ready[0]:
             recv_start_time = time.time()
