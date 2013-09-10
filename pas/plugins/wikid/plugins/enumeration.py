@@ -44,7 +44,8 @@ class UserEnumerator(object):
             'sort_by': sort_by,
             'exact_match': exact_match,
             'max_results': max_results,
-        }.update(kw)
+        }
+        keys.update(kw)
         user_info = self.ZCacheable_get(
             view_name=view_name,
             keywords=keys,
